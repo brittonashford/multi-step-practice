@@ -1,51 +1,74 @@
-import { Card, CardContent, Typography } from '@material-ui/core';
-import { Formik, Form, Field } from 'formik';
-import { CheckboxWithLabel, TextField } from 'formik-material-ui';
+import { Card, CardContent, Typography } from "@material-ui/core";
+import { getThemeProps } from "@material-ui/styles";
+import { Formik, Form, Field, FormikConfig, FormikValues } from "formik";
+import { CheckboxWithLabel, TextField } from "formik-material-ui";
+import React, { useState } from "react";
+import { mixed, number, object } from "yup";
 
 export default function Home() {
   return (
     <Card>
       <CardContent>
-        <Formik
-            initialValues={{
-                firstname: '',
-                lastName: '',
-                millionaire: false,
-                money: 0,
-                description: ''
-            }}
-            onSubmit={() => {}}>
-            <Form>
-                <Field 
-                    name="firstName"
-                    component={TextField}
-                    label="First Name"
-                />
-                <Field
-                    name="lastName"
-                    component={TextField}
-                    label="Last Name"
-                />
-                <Field 
-                    name="millionaire"
-                    type="checkbox"
-                    component={CheckboxWithLabel}
-                    Label={{ label: 'I am a Millionaire' }}
-                />
-                <Field  
-                    name="money"
-                    type="number"
-                    component={TextField}
-                    label="All the money I have"
-                />
-                <Field
-                    name="description"
-                    component={}
-                    label="Description"
-                />
-            </Form>
-        </Formik>
+        <FormikStepper
+          validationSchema={object({
+            money: mixed().when("millionaire", {
+              is: true,
+              then: number()
+                .required()
+                .min(1_000_000, "You must have 1,000,000 to be a millionaire"),
+              otherwise: number().required(),
+            }),
+          })}
+          initialValues={{
+            firstname: "",
+            lastName: "",
+            millionaire: false,
+            money: 0,
+            description: "",
+          }}
+          onSubmit={() => {}}
+        >
+          <div>
+            <Field name="firstName" component={TextField} label="First Name" />
+            <Field name="lastName" component={TextField} label="Last Name" />
+            <Field
+              name="millionaire"
+              type="checkbox"
+              component={CheckboxWithLabel}
+              Label={{ label: "I am a Millionaire" }}
+            />
+          </div>
+
+          <div>
+            <Field
+              name="money"
+              type="number"
+              component={TextField}
+              label="All the money I have"
+            />
+          </div>
+
+          <div>
+            <Field
+              name="description"
+              component={TextField}
+              label="Description"
+            />
+          </div>
+        </FormikStepper>
       </CardContent>
     </Card>
   );
+}
+
+export function FormikStepper({children, ...props}: FormikConfig<FormikValues>) {
+    const childrenArray = React.Children.toArray(children);
+    const [step, setStep] = useState(0);
+    const currentChild = childrenArray[step];
+
+    return (
+        <Formik {...props}>
+            <Form autoComplete="off">{children}</Form>
+        </Formik>
+    );
 }
