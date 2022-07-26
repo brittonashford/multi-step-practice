@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <Card>
       <CardContent>
-        <Formik>
+        <Formik
             initialValues={{
                 firstname: '',
                 lastName: '',
@@ -14,8 +14,7 @@ export default function Home() {
                 money: 0,
                 description: ''
             }}
-            onSubmit={() => {}}
-            </CardContent>
+            onSubmit={() => {}}>
             <Form>
                 <Field 
                     name="firstName"
